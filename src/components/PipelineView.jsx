@@ -1,4 +1,4 @@
-import { Phone, MoreVertical, MapPin, Briefcase } from 'lucide-react';
+import { Phone, Mail, MoreVertical, MapPin, Briefcase } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const PipelineView = ({ stages, jobs, onJobClick }) => {
@@ -66,12 +66,20 @@ const JobCard = ({ job, onClick }) => {
                 <span className="text-[10px] font-bold text-primary tracking-widest uppercase">
                     {job.trade}
                 </span>
-                <button
-                    onClick={(e) => { e.stopPropagation(); window.open(`tel:${job.phone}`); }}
-                    className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-primary/5 transition-all outline-none"
-                >
-                    <Phone size={14} />
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={(e) => { e.stopPropagation(); alert(`Opening Email for ${job.clientName}`); }}
+                        className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-primary/5 transition-all outline-none"
+                    >
+                        <Mail size={14} />
+                    </button>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); window.open(`tel:${job.phone}`); }}
+                        className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-primary/5 transition-all outline-none"
+                    >
+                        <Phone size={14} />
+                    </button>
+                </div>
             </div>
 
             <h3 className="text-lg font-title font-bold text-gray-900 leading-tight mb-1 group-hover:text-primary transition-colors">

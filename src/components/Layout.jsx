@@ -5,6 +5,7 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
         { id: 'pipeline', icon: LayoutGrid, label: 'Pipeline' },
         { id: 'clients', icon: Users, label: 'Clients' },
         { id: 'checklist', icon: ClipboardCheck, label: 'JFC' },
+        { id: 'notifications', icon: Bell, label: 'Notifications' },
         { id: 'settings', icon: Settings, label: 'Settings' },
     ];
 
@@ -20,8 +21,8 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                         key={item.id}
                         onClick={() => setActiveTab(item.id)}
                         className={`p-3 rounded-xl transition-all duration-200 ${activeTab === item.id
-                                ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}
                     >
                         <item.icon size={28} />
@@ -31,9 +32,6 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
             </nav>
 
             <div className="mt-auto flex flex-col gap-6 border-t border-white/10 pt-6">
-                <button className="text-gray-400 hover:text-white transition-colors">
-                    <Bell size={24} />
-                </button>
                 <button className="text-gray-400 hover:text-primary transition-colors">
                     <LogOut size={24} />
                 </button>
