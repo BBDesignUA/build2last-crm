@@ -1,9 +1,9 @@
-import { X, CheckCircle2, Circle, DollarSign, Camera, MessageSquare, Phone, ClipboardCheck, Info, Tag } from 'lucide-react';
+import { X, CheckCircle2, Circle, DollarSign, Camera, MessageSquare, Phone, ClipboardCheck, Info, Tag, Trash2, Edit, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { CHECKLIST_DATA } from '../data/mockData';
 
-export const JobDashboardModal = ({ job, onClose, onUpdateJob }) => {
+export const JobDashboardModal = ({ job, onClose, onUpdateJob, onDeleteJob }) => {
     const [activeSubTab, setActiveSubTab] = useState('pricing');
 
     // Load template based on size and status if checklist is empty
@@ -100,8 +100,19 @@ export const JobDashboardModal = ({ job, onClose, onUpdateJob }) => {
                                 CALL
                             </button>
                             <button
+                                onClick={() => {
+                                    if (window.confirm(`Are you sure you want to delete ${job.clientName}'s job permanently?`)) {
+                                        onDeleteJob(job.id);
+                                    }
+                                }}
+                                className="flex items-center gap-2 px-6 py-3 bg-red-50 border border-red-100 rounded-2xl font-title font-bold text-red-600 hover:bg-red-100 transition-all active:scale-95 shadow-sm"
+                            >
+                                <Trash2 size={18} />
+                                DELETE JOB
+                            </button>
+                            <button
                                 onClick={onClose}
-                                className="p-3 bg-white text-gray-400 border border-gray-200 rounded-2xl hover:text-primary transition-all active:rotate-90 hover:shadow-md"
+                                className="p-3 bg-white text-gray-400 border border-gray-200 rounded-2xl hover:text-primary transition-all active:rotate-90 hover:shadow-md ml-2"
                             >
                                 <X size={24} />
                             </button>
@@ -197,6 +208,7 @@ export const JobDashboardModal = ({ job, onClose, onUpdateJob }) => {
                         <div className="flex border-b border-gray-100 bg-white shadow-sm z-10">
                             {[
                                 { id: 'pricing', label: 'Pricing', icon: DollarSign },
+                                { id: 'intake', label: 'Intake Form', icon: HelpCircle },
                                 { id: 'photos', label: 'Photos', icon: Camera },
                                 { id: 'activity', label: 'Activity Feed', icon: MessageSquare },
                             ].map((tab) => (
@@ -270,6 +282,91 @@ export const JobDashboardModal = ({ job, onClose, onUpdateJob }) => {
                                             {job.notes || 'No specific notes recorded for this job yet.'}
                                         </div>
                                     </div>
+                                </div>
+                            )}
+
+                            {activeSubTab === 'intake' && (
+                                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                                    {(!job.questionnaire) ? (
+                                        <div className="flex flex-col items-center justify-center min-h-[400px] text-center text-gray-400 opacity-60 p-12">
+                                            <HelpCircle size={48} className="mb-6" />
+                                            <p className="font-title text-xl uppercase tracking-widest">No Intake Form Available</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-6">
+                                                <h4 className="font-title font-bold text-primary tracking-wider uppercase mb-6 flex items-center gap-2">
+                                                    General Questions
+                                                </h4>
+
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">1. How did you hear about us?</p>
+                                                        <p className="font-body text-sm font-medium text-gray-900">{job.questionnaire.hearAboutUs || 'N/A'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">2. What is the current issue?</p>
+                                                        <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 font-body text-sm text-gray-700 whitespace-pre-wrap">
+                                                            {job.questionnaire.currentIssue || 'N/A'}
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">3. How long has this issue been going on?</p>
+                                                            <p className="font-body text-sm font-medium text-gray-900">{job.questionnaire.issueDuration || 'N/A'}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">3.1 Filing an insurance claim?</p>
+                                                            <p className="font-body text-sm font-medium text-gray-900">{job.questionnaire.insuranceClaim || 'N/A'}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">3.2 Required Urgency</p>
+                                                        <p className="font-body text-sm font-medium text-gray-900">{job.questionnaire.urgency || 'N/A'}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm space-y-6">
+                                                <h4 className="font-title font-bold text-primary tracking-wider uppercase mb-6 flex items-center gap-2">
+                                                    Property & Additional Details
+                                                </h4>
+
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div>
+                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">4. Home Age</p>
+                                                        <p className="font-body text-sm font-medium text-gray-900">{job.questionnaire.homeAge || 'N/A'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">5. Roof/Siding Age</p>
+                                                        <p className="font-body text-sm font-medium text-gray-900">{job.questionnaire.componentAge || 'N/A'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">6. Roof Type</p>
+                                                        <p className="font-body text-sm font-medium text-gray-900">{job.questionnaire.roofType || 'N/A'}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">7. Previous attempts to fix?</p>
+                                                        <p className="font-body text-sm font-medium text-gray-900">{job.questionnaire.previousAttempts || 'N/A'}</p>
+                                                    </div>
+                                                    {job.questionnaire.previousAttempts === 'Yes' && (
+                                                        <div>
+                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">7.1 Who & what did they do?</p>
+                                                            <p className="font-body text-sm font-medium text-gray-900 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">{job.questionnaire.previousAttemptsDetails || 'N/A'}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="bg-primary/5 rounded-[2rem] p-8 border border-primary/10">
+                                                <p className="text-[10px] font-bold text-primary uppercase tracking-widest leading-none mb-2">8. Best Call-back Time for Perry</p>
+                                                <p className="font-title text-xl font-bold text-primary">{job.questionnaire.callbackTime || 'Not specified'}</p>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             )}
 

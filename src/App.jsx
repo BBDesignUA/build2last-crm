@@ -1,21 +1,31 @@
 import { useState } from 'react';
 import { Sidebar, Header } from './components/Layout';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutGrid, ListTodo } from 'lucide-react';
+import { LayoutGrid, ListTodo, CheckCircle2, X } from 'lucide-react';
 
-import { MOCK_STAGES, MOCK_JOBS } from './data/mockData';
+import { MOCK_STAGES, MOCK_JOBS, MOCK_CLIENTS } from './data/mockData';
 import { PipelineView } from './components/PipelineView';
 import { WorkflowView } from './components/WorkflowView';
 import { NotificationsView } from './components/NotificationsView';
+import { ClientsView } from './components/ClientsView';
 import { JobDashboardModal } from './components/JobDashboard';
+import { CreateJobModal } from './components/CreateJobModal';
+import { LoginView } from './components/LoginView';
+import { TeamView } from './components/TeamView';
+import { useAuth } from './contexts/AuthContext';
 
 function App() {
+    const { user } = useAuth();
+    const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
     const [activeTab, setActiveTab] = useState('pipeline');
     const [viewMode, setViewMode] = useState('workflow'); // 'board' or 'workflow'
     const [searchQuery, setSearchQuery] = useState('');
     const [jobs, setJobs] = useState(MOCK_JOBS);
+    const [clients, setClients] = useState(MOCK_CLIENTS);
     const [selectedJob, setSelectedJob] = useState(null);
     const [focusedWorkflowJob, setFocusedWorkflowJob] = useState(MOCK_JOBS[0]);
+    const [isCreateJobOpen, setIsCreateJobOpen] = useState(false);
+    const [toast, setToast] = useState(null);
 
     const filteredJobs = jobs.filter(job =>
         job.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -29,6 +39,52 @@ function App() {
         if (focusedWorkflowJob?.id === updatedJob.id) setFocusedWorkflowJob(updatedJob);
     };
 
+    const handleAddJob = (newJob) => {
+        setJobs(prev => [newJob, ...prev]);
+        setToast(`New job created for ${newJob.clientName}`);
+    };
+
+    const handleDeleteJob = (jobId) => {
+        setJobs(jobs.filter(j => j.id !== jobId));
+        if (selectedJob?.id === jobId) setSelectedJob(null);
+        if (focusedWorkflowJob?.id === jobId) setFocusedWorkflowJob(null);
+        setToast('Job successfully deleted');
+    };
+
+    const handleAddClient = (newClient) => {
+        setClients(prev => [...prev, newClient]);
+        setToast(`Client ${newClient.name} added`);
+    };
+
+    const handleUpdateClient = (updatedClient) => {
+        setClients(clients.map(c => c.id === updatedClient.id ? updatedClient : c));
+        setToast(`Client ${updatedClient.name} updated`);
+    };
+
+    const handleDeleteClient = (clientId) => {
+        setClients(clients.filter(c => c.id !== clientId));
+        // Note: keeping orphans intentionally for demonstration, or could prompt to delete jobs
+        setToast('Client deleted');
+    };
+
+    const showToast = (message) => {
+        setToast(message);
+        setTimeout(() => setToast(null), 3000);
+    };
+
+    const handleSendEmail = (job) => {
+        // Find job and add activity entry
+        const updatedJob = {
+            ...job,
+            communications: [
+                { id: `m-${Date.now()}`, type: 'email', date: new Date().toISOString().split('T')[0], text: `Automated/Manual email sent to ${job.clientName}` },
+                ...(job.communications || [])
+            ]
+        };
+        handleUpdateJob(updatedJob);
+        showToast(`Email notification dispatched to ${job.clientName}`);
+    };
+
     const handleJobSelect = (job) => {
         if (viewMode === 'workflow') {
             setFocusedWorkflowJob(job);
@@ -37,11 +93,20 @@ function App() {
         }
     };
 
+    if (!user) {
+        return <LoginView />;
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 flex text-gray-900">
-            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <Sidebar
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                isExpanded={isSidebarExpanded}
+                setIsExpanded={setIsSidebarExpanded}
+            />
 
-            <main className="flex-1 ml-20 md:ml-24 flex flex-col min-h-screen">
+            <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isSidebarExpanded ? 'ml-64' : 'ml-20 md:ml-24'}`}>
                 <Header onSearch={setSearchQuery} />
 
                 <div className="flex-1 p-8">
@@ -103,6 +168,8 @@ function App() {
                                             stages={MOCK_STAGES}
                                             jobs={filteredJobs}
                                             onJobClick={handleJobSelect}
+                                            onSendEmail={handleSendEmail}
+                                            onAddJobClick={() => setIsCreateJobOpen(true)}
                                         />
                                     ) : (
                                         <div className="flex-1 flex gap-8 min-h-0">
@@ -140,6 +207,7 @@ function App() {
                                                     job={focusedWorkflowJob}
                                                     stages={MOCK_STAGES}
                                                     onUpdateJob={handleUpdateJob}
+                                                    onSendEmail={handleSendEmail}
                                                 />
                                             </div>
                                         </div>
@@ -151,7 +219,25 @@ function App() {
                                 <NotificationsView />
                             )}
 
-                            {activeTab !== 'pipeline' && activeTab !== 'notifications' && (
+                            {activeTab === 'clients' && (
+                                <ClientsView
+                                    clients={clients}
+                                    jobs={jobs}
+                                    onAddClient={handleAddClient}
+                                    onUpdateClient={handleUpdateClient}
+                                    onDeleteClient={handleDeleteClient}
+                                    onJobClick={(job) => {
+                                        setSelectedJob(job);
+                                        // Optional: switch to pipeline if needed
+                                    }}
+                                />
+                            )}
+
+                            {activeTab === 'team' && (
+                                <TeamView />
+                            )}
+
+                            {activeTab !== 'pipeline' && activeTab !== 'notifications' && activeTab !== 'clients' && activeTab !== 'team' && (
                                 <div className="flex flex-col items-center justify-center h-[80vh] text-center text-gray-400">
                                     <h2 className="text-3xl font-title font-bold mb-2 tracking-widest uppercase">{activeTab} View</h2>
                                     <p className="font-body opacity-60">This module is part of the future development roadmap.</p>
@@ -167,7 +253,37 @@ function App() {
                             job={selectedJob}
                             onClose={() => setSelectedJob(null)}
                             onUpdateJob={handleUpdateJob}
+                            onDeleteJob={handleDeleteJob}
                         />
+                    )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    {isCreateJobOpen && (
+                        <CreateJobModal
+                            onClose={() => setIsCreateJobOpen(false)}
+                            onAddJob={handleAddJob}
+                            clients={clients}
+                            onAddClient={handleAddClient}
+                        />
+                    )}
+                </AnimatePresence>
+
+                {/* Global Toast Notification */}
+                <AnimatePresence>
+                    {toast && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                            className="fixed bottom-8 right-8 bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 border border-white/10"
+                        >
+                            <CheckCircle2 size={20} className="text-green-400" />
+                            <span className="font-body text-sm font-medium tracking-wide">{toast}</span>
+                            <button onClick={() => setToast(null)} className="ml-4 text-gray-400 hover:text-white transition-colors">
+                                <X size={16} />
+                            </button>
+                        </motion.div>
                     )}
                 </AnimatePresence>
             </main>

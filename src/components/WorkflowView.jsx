@@ -9,11 +9,12 @@ import {
     DollarSign,
     User,
     MapPin,
-    Briefcase
+    Briefcase,
+    Mail
 } from 'lucide-react';
 import { CHECKLIST_DATA } from '../data/mockData';
 
-export const WorkflowView = ({ job, stages, onUpdateJob }) => {
+export const WorkflowView = ({ job, stages, onUpdateJob, onSendEmail }) => {
     const [expandedTaskId, setExpandedTaskId] = useState(null);
 
     const toggleExpand = (e, taskId) => {
@@ -89,7 +90,13 @@ export const WorkflowView = ({ job, stages, onUpdateJob }) => {
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col md:flex-row items-end md:items-center gap-3">
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onSendEmail(job); }}
+                        className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary transition-all shadow-sm"
+                    >
+                        <Mail size={18} />
+                    </button>
                     <div className={`px-4 py-2 rounded-xl border font-title font-bold uppercase tracking-widest text-xs ${job.priority === 'high' ? 'bg-primary/5 text-primary border-primary/10' : 'bg-gray-50 text-gray-500 border-gray-100'
                         }`}>
                         {job.priority} Priority

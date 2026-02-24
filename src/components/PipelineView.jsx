@@ -1,22 +1,34 @@
 import { Phone, Mail, MoreVertical, MapPin, Briefcase } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export const PipelineView = ({ stages, jobs, onJobClick }) => {
+export const PipelineView = ({ stages, jobs, onJobClick, onSendEmail, onAddJobClick }) => {
     return (
-        <div className="flex gap-6 h-full overflow-x-auto pb-4 scrollbar-hide">
-            {stages.map((stage) => (
-                <KanbanColumn
-                    key={stage.id}
-                    stage={stage}
-                    jobs={jobs.filter((j) => j.status === stage.id)}
-                    onJobClick={onJobClick}
-                />
-            ))}
+        <div className="flex flex-col h-full gap-4">
+            <div className="flex justify-end pr-6">
+                <button
+                    onClick={onAddJobClick}
+                    className="px-6 py-3 rounded-2xl bg-primary shadow-lg shadow-primary/20 font-title font-bold text-xs uppercase tracking-widest text-white hover:opacity-90 transition-all flex items-center gap-2 active:scale-[0.98]"
+                >
+                    <Briefcase size={16} />
+                    New Job
+                </button>
+            </div>
+            <div className="flex gap-6 h-full overflow-x-auto pb-4 scrollbar-hide">
+                {stages.map((stage) => (
+                    <KanbanColumn
+                        key={stage.id}
+                        stage={stage}
+                        jobs={jobs.filter((j) => j.status === stage.id)}
+                        onJobClick={onJobClick}
+                        onSendEmail={onSendEmail}
+                    />
+                ))}
+            </div>
         </div>
     );
 };
 
-const KanbanColumn = ({ stage, jobs, onJobClick }) => {
+const KanbanColumn = ({ stage, jobs, onJobClick, onSendEmail }) => {
     return (
         <div className="flex-shrink-0 w-80 md:w-96 flex flex-col h-full">
             <div className="flex items-center justify-between mb-4 px-2">
@@ -38,7 +50,7 @@ const KanbanColumn = ({ stage, jobs, onJobClick }) => {
                     </div>
                 ) : (
                     jobs.map((job) => (
-                        <JobCard key={job.id} job={job} onClick={() => onJobClick(job)} />
+                        <JobCard key={job.id} job={job} onClick={() => onJobClick(job)} onSendEmail={onSendEmail} />
                     ))
                 )}
             </div>
@@ -46,7 +58,7 @@ const KanbanColumn = ({ stage, jobs, onJobClick }) => {
     );
 };
 
-const JobCard = ({ job, onClick }) => {
+const JobCard = ({ job, onClick, onSendEmail }) => {
     const priorityColors = {
         high: 'bg-red-500',
         medium: 'bg-orange-500',
@@ -68,7 +80,7 @@ const JobCard = ({ job, onClick }) => {
                 </span>
                 <div className="flex gap-2">
                     <button
-                        onClick={(e) => { e.stopPropagation(); alert(`Opening Email for ${job.clientName}`); }}
+                        onClick={(e) => { e.stopPropagation(); onSendEmail(job); }}
                         className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-primary/5 transition-all outline-none"
                     >
                         <Mail size={14} />

@@ -129,3 +129,50 @@ export const MOCK_JOBS = [
         communications: []
     },
 ];
+
+export const MOCK_CLIENTS = [
+    {
+        id: 'client-1',
+        name: 'Robert Smith',
+        spouseName: 'Mary Smith',
+        address: '123 Main St, Richboro, PA',
+        phone: '(215) 555-0123',
+        email: 'robert@example.com',
+        notes: 'Very detail-oriented. Prefers communication via email.'
+    },
+    {
+        id: 'client-2',
+        name: 'Sarah Johnson',
+        spouseName: '',
+        address: '456 Oak Ave, Doylestown, PA',
+        phone: '(215) 555-0456',
+        email: 'sarah.j@example.com',
+        notes: 'Interested in future window replacement project.'
+    },
+    {
+        id: 'client-3',
+        name: 'Michael Brown',
+        spouseName: 'Linda Brown',
+        address: '789 Pine Ln, Newtown, PA',
+        phone: '(215) 555-0789',
+        email: 'mbrown@example.com',
+        notes: 'Referred by neighbors.'
+    }
+];
+
+export const MOCK_USERS = [
+    {
+        id: 'user-1',
+        name: 'System Admin',
+        email: 'admin@gmail.com',
+        role: 'admin',
+        password: 'admin' // In a real app this would be hashed
+    },
+    {
+        id: 'user-2',
+        name: 'Project Manager',
+        email: 'manager@antigravity.com',
+        role: 'manager',
+        password: 'password'
+    }
+];
