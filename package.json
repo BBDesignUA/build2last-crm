@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BBDesignUA/build2last-crm.git"
+    "url": "git+https://github.com/BBDesignUA/build2last-jfc.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/BBDesignUA/build2last-crm/issues"
+    "url": "https://github.com/BBDesignUA/build2last-jfc/issues"
   },
-  "homepage": "https://github.com/BBDesignUA/build2last-crm#readme",
+  "homepage": "https://github.com/BBDesignUA/build2last-jfc#readme",
   "description": "",
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.1",
