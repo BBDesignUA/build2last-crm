@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Sidebar, Header } from './components/Layout';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutGrid, ListTodo, CheckCircle2, X } from 'lucide-react';
+import { CheckCircle2, X, Briefcase, Plus } from 'lucide-react';
 
 import { MOCK_STAGES, MOCK_JOBS, MOCK_CLIENTS } from './data/mockData';
-import { PipelineView } from './components/PipelineView';
 import { WorkflowView } from './components/WorkflowView';
 import { NotificationsView } from './components/NotificationsView';
 import { ClientsView } from './components/ClientsView';
@@ -18,7 +17,6 @@ function App() {
     const { user } = useAuth();
     const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
     const [activeTab, setActiveTab] = useState('pipeline');
-    const [viewMode, setViewMode] = useState('workflow'); // 'board' or 'workflow'
     const [searchQuery, setSearchQuery] = useState('');
     const [jobs, setJobs] = useState(MOCK_JOBS);
     const [clients, setClients] = useState(MOCK_CLIENTS);
@@ -86,11 +84,7 @@ function App() {
     };
 
     const handleJobSelect = (job) => {
-        if (viewMode === 'workflow') {
-            setFocusedWorkflowJob(job);
-        } else {
-            setSelectedJob(job);
-        }
+        setFocusedWorkflowJob(job);
     };
 
     if (!user) {
@@ -112,7 +106,7 @@ function App() {
                 <div className="flex-1 p-8">
                     <AnimatePresence mode="wait">
                         <motion.div
-                            key={`${activeTab}-${viewMode}`}
+                            key={`${activeTab}`}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
@@ -128,25 +122,14 @@ function App() {
                                         </div>
 
                                         <div className="flex items-center gap-6">
-                                            {/* View Switcher */}
-                                            <div className="bg-white p-1 rounded-2xl border border-gray-200 flex shadow-sm">
-                                                <button
-                                                    onClick={() => setViewMode('board')}
-                                                    className={`px-5 py-2.5 rounded-xl font-title font-bold uppercase tracking-wider text-[10px] flex items-center gap-2 transition-all ${viewMode === 'board' ? 'bg-primary text-white shadow-md' : 'text-gray-400 hover:text-gray-600'
-                                                        }`}
-                                                >
-                                                    <LayoutGrid size={14} />
-                                                    BOARD
-                                                </button>
-                                                <button
-                                                    onClick={() => setViewMode('workflow')}
-                                                    className={`px-5 py-2.5 rounded-xl font-title font-bold uppercase tracking-wider text-[10px] flex items-center gap-2 transition-all ${viewMode === 'workflow' ? 'bg-primary text-white shadow-md' : 'text-gray-400 hover:text-gray-600'
-                                                        }`}
-                                                >
-                                                    <ListTodo size={14} />
-                                                    WORKFLOW
-                                                </button>
-                                            </div>
+                                            {/* Action Button */}
+                                            <button
+                                                onClick={() => setIsCreateJobOpen(true)}
+                                                className="px-6 py-3 rounded-2xl bg-primary shadow-lg shadow-primary/20 font-title font-bold text-xs uppercase tracking-widest text-white hover:opacity-90 transition-all flex items-center gap-2 active:scale-[0.98]"
+                                            >
+                                                <Briefcase size={16} />
+                                                New Job
+                                            </button>
 
                                             <div className="bg-white p-1 rounded-2xl border border-gray-200 flex gap-1 shadow-sm h-[48px]">
                                                 <div className="px-5 flex flex-col justify-center border-r border-gray-100">
@@ -163,55 +146,46 @@ function App() {
                                         </div>
                                     </div>
 
-                                    {viewMode === 'board' ? (
-                                        <PipelineView
-                                            stages={MOCK_STAGES}
-                                            jobs={filteredJobs}
-                                            onJobClick={handleJobSelect}
-                                            onSendEmail={handleSendEmail}
-                                            onAddJobClick={() => setIsCreateJobOpen(true)}
-                                        />
-                                    ) : (
-                                        <div className="flex-1 flex gap-8 min-h-0">
-                                            {/* Mini Sidebar for Job Selection in Workflow View */}
-                                            <div className="w-80 flex flex-col gap-4 overflow-y-auto pr-2">
-                                                {filteredJobs.map(j => (
-                                                    <button
-                                                        key={j.id}
-                                                        onClick={() => setFocusedWorkflowJob(j)}
-                                                        className={`p-6 rounded-[2rem] border text-left transition-all active:scale-[0.98] ${focusedWorkflowJob?.id === j.id
-                                                            ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
-                                                            : 'bg-white border-gray-100 hover:border-gray-200 shadow-sm'
-                                                            }`}
-                                                    >
-                                                        <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${focusedWorkflowJob?.id === j.id ? 'text-white/70' : 'text-gray-400'
+                                    <div className="flex-1 flex gap-8 min-h-0">
+                                        {/* Mini Sidebar for Job Selection in Workflow View */}
+                                        <div className="w-80 flex flex-col gap-4 overflow-y-auto pr-2">
+                                            {filteredJobs.map(j => (
+                                                <button
+                                                    key={j.id}
+                                                    onClick={() => setFocusedWorkflowJob(j)}
+                                                    className={`p-6 rounded-[2rem] border text-left transition-all active:scale-[0.98] ${focusedWorkflowJob?.id === j.id
+                                                        ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
+                                                        : 'bg-white border-gray-100 hover:border-gray-200 shadow-sm'
+                                                        }`}
+                                                >
+                                                    <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${focusedWorkflowJob?.id === j.id ? 'text-white/70' : 'text-gray-400'
+                                                        }`}>
+                                                        {j.trade}
+                                                    </p>
+                                                    <p className="font-title font-bold text-lg leading-tight mb-2 uppercase tracking-tight">
+                                                        {j.clientName}
+                                                    </p>
+                                                    <div className="flex items-center justify-between">
+                                                        <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter ${focusedWorkflowJob?.id === j.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
                                                             }`}>
-                                                            {j.trade}
-                                                        </p>
-                                                        <p className="font-title font-bold text-lg leading-tight mb-2 uppercase tracking-tight">
-                                                            {j.clientName}
-                                                        </p>
-                                                        <div className="flex items-center justify-between">
-                                                            <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter ${focusedWorkflowJob?.id === j.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
-                                                                }`}>
-                                                                {j.status.replace('-', ' ')}
-                                                            </span>
-                                                            <span className="text-xs font-title font-bold">${j.pricing.total.toLocaleString()}</span>
-                                                        </div>
-                                                    </button>
-                                                ))}
-                                            </div>
-
-                                            <div className="flex-1 min-h-0">
-                                                <WorkflowView
-                                                    job={focusedWorkflowJob}
-                                                    stages={MOCK_STAGES}
-                                                    onUpdateJob={handleUpdateJob}
-                                                    onSendEmail={handleSendEmail}
-                                                />
-                                            </div>
+                                                            {j.status.replace('-', ' ')}
+                                                        </span>
+                                                        <span className="text-xs font-title font-bold">${j.pricing.total.toLocaleString()}</span>
+                                                    </div>
+                                                </button>
+                                            ))}
                                         </div>
-                                    )}
+
+                                        {/* Main Workflow View */}
+                                        <div className="flex-1 overflow-y-auto pr-2 pb-8">
+                                            <WorkflowView
+                                                job={focusedWorkflowJob}
+                                                stages={MOCK_STAGES}
+                                                onUpdateJob={handleUpdateJob}
+                                                onSendEmail={handleSendEmail}
+                                            />
+                                        </div>
+                                    </div>
                                 </>
                             )}
 
