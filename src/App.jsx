@@ -3,11 +3,18 @@ import { Sidebar, Header } from './components/Layout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, X, Briefcase, Plus } from 'lucide-react';
 
+<<<<<<< HEAD
 import { MOCK_STAGES, MOCK_JOBS, MOCK_CLIENTS, MOCK_WORKFLOWS } from './data/mockData';
 import { WorkflowView } from './components/WorkflowView';
 import { NotificationsView } from './components/NotificationsView';
 import { ClientsView } from './components/ClientsView';
 import { ChecklistsView } from './components/ChecklistsView';
+=======
+import { MOCK_STAGES, MOCK_JOBS, MOCK_CLIENTS } from './data/mockData';
+import { WorkflowView } from './components/WorkflowView';
+import { NotificationsView } from './components/NotificationsView';
+import { ClientsView } from './components/ClientsView';
+>>>>>>> 3a8d989b334644d5b788eec4cc011f5a4bd66d06
 import { JobDashboardModal } from './components/JobDashboard';
 import { CreateJobModal } from './components/CreateJobModal';
 import { LoginView } from './components/LoginView';
@@ -21,7 +28,10 @@ function App() {
     const [searchQuery, setSearchQuery] = useState('');
     const [jobs, setJobs] = useState(MOCK_JOBS);
     const [clients, setClients] = useState(MOCK_CLIENTS);
+<<<<<<< HEAD
     const [checklists, setChecklists] = useState(MOCK_WORKFLOWS); // This will store our custom workflow definitions
+=======
+>>>>>>> 3a8d989b334644d5b788eec4cc011f5a4bd66d06
     const [selectedJob, setSelectedJob] = useState(null);
     const [focusedWorkflowJob, setFocusedWorkflowJob] = useState(MOCK_JOBS[0]);
     const [isCreateJobOpen, setIsCreateJobOpen] = useState(false);
@@ -209,6 +219,7 @@ function App() {
                                 />
                             )}
 
+<<<<<<< HEAD
                             {activeTab === 'checklists' && (
                                 <ChecklistsView
                                     checklists={checklists}
@@ -216,11 +227,17 @@ function App() {
                                 />
                             )}
 
+=======
+>>>>>>> 3a8d989b334644d5b788eec4cc011f5a4bd66d06
                             {activeTab === 'team' && (
                                 <TeamView />
                             )}
 
+<<<<<<< HEAD
                             {activeTab !== 'pipeline' && activeTab !== 'notifications' && activeTab !== 'clients' && activeTab !== 'team' && activeTab !== 'checklists' && (
+=======
+                            {activeTab !== 'pipeline' && activeTab !== 'notifications' && activeTab !== 'clients' && activeTab !== 'team' && (
+>>>>>>> 3a8d989b334644d5b788eec4cc011f5a4bd66d06
                                 <div className="flex flex-col items-center justify-center h-[80vh] text-center text-gray-400">
                                     <h2 className="text-3xl font-title font-bold mb-2 tracking-widest uppercase">{activeTab} View</h2>
                                     <p className="font-body opacity-60">This module is part of the future development roadmap.</p>

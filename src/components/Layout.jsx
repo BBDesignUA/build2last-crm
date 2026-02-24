@@ -7,7 +7,11 @@ export const Sidebar = ({ activeTab, setActiveTab, isExpanded, setIsExpanded }) 
     const menuItems = [
         { id: 'pipeline', icon: LayoutGrid, label: 'Pipeline' },
         { id: 'clients', icon: Users, label: 'Clients' },
+<<<<<<< HEAD
         { id: 'checklists', icon: ClipboardCheck, label: 'Checklists' },
+=======
+        { id: 'checklist', icon: ClipboardCheck, label: 'JFC' },
+>>>>>>> 3a8d989b334644d5b788eec4cc011f5a4bd66d06
         { id: 'notifications', icon: Bell, label: 'Notifications' },
         // Only show team management to admins
         ...(user?.role === 'admin' ? [{ id: 'team', icon: Shield, label: 'Team access' }] : []),

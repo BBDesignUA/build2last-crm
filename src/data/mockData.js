@@ -9,6 +9,7 @@ export const MOCK_STAGES = [
     { id: 'completed', title: 'Completed / Paid' },
 ];
 
+<<<<<<< HEAD
 export const MOCK_WORKFLOWS = [
     {
         id: 'wf-roofing',
@@ -34,6 +35,8 @@ export const MOCK_WORKFLOWS = [
     }
 ];
 
+=======
+>>>>>>> 3a8d989b334644d5b788eec4cc011f5a4bd66d06
 export const CHECKLIST_DATA = {
     Small: {
         lead: [
