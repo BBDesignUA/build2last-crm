@@ -3,10 +3,11 @@ import { Sidebar, Header } from './components/Layout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, X, Briefcase, Plus } from 'lucide-react';
 
-import { MOCK_STAGES, MOCK_JOBS, MOCK_CLIENTS } from './data/mockData';
+import { MOCK_STAGES, MOCK_JOBS, MOCK_CLIENTS, MOCK_WORKFLOWS } from './data/mockData';
 import { WorkflowView } from './components/WorkflowView';
 import { NotificationsView } from './components/NotificationsView';
 import { ClientsView } from './components/ClientsView';
+import { ChecklistsView } from './components/ChecklistsView';
 import { JobDashboardModal } from './components/JobDashboard';
 import { CreateJobModal } from './components/CreateJobModal';
 import { LoginView } from './components/LoginView';
@@ -20,6 +21,7 @@ function App() {
     const [searchQuery, setSearchQuery] = useState('');
     const [jobs, setJobs] = useState(MOCK_JOBS);
     const [clients, setClients] = useState(MOCK_CLIENTS);
+    const [checklists, setChecklists] = useState(MOCK_WORKFLOWS); // This will store our custom workflow definitions
     const [selectedJob, setSelectedJob] = useState(null);
     const [focusedWorkflowJob, setFocusedWorkflowJob] = useState(MOCK_JOBS[0]);
     const [isCreateJobOpen, setIsCreateJobOpen] = useState(false);
@@ -207,11 +209,18 @@ function App() {
                                 />
                             )}
 
+                            {activeTab === 'checklists' && (
+                                <ChecklistsView
+                                    checklists={checklists}
+                                    onUpdateChecklists={setChecklists}
+                                />
+                            )}
+
                             {activeTab === 'team' && (
                                 <TeamView />
                             )}
 
-                            {activeTab !== 'pipeline' && activeTab !== 'notifications' && activeTab !== 'clients' && activeTab !== 'team' && (
+                            {activeTab !== 'pipeline' && activeTab !== 'notifications' && activeTab !== 'clients' && activeTab !== 'team' && activeTab !== 'checklists' && (
                                 <div className="flex flex-col items-center justify-center h-[80vh] text-center text-gray-400">
                                     <h2 className="text-3xl font-title font-bold mb-2 tracking-widest uppercase">{activeTab} View</h2>
                                     <p className="font-body opacity-60">This module is part of the future development roadmap.</p>

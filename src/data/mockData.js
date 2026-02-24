@@ -9,6 +9,31 @@ export const MOCK_STAGES = [
     { id: 'completed', title: 'Completed / Paid' },
 ];
 
+export const MOCK_WORKFLOWS = [
+    {
+        id: 'wf-roofing',
+        name: 'Standard Roofing',
+        description: 'Complete asphalt shingle roof replacement process.',
+        stages: [
+            {
+                id: 'stg-1',
+                name: 'Pre-Production',
+                tasks: [
+                    { id: 't1', type: 'checkbox', label: 'Verify Measurements', description: 'Double check eagleview report', required: true, options: [] },
+                    { id: 't2', type: 'dropdown', label: 'Shingle Type', description: '', required: true, options: ['Architectural', '3-Tab', 'Designer'] }
+                ]
+            },
+            {
+                id: 'stg-2',
+                name: 'Production',
+                tasks: [
+                    { id: 't3', type: 'image', label: 'Tear-off Photo', description: 'Upload photo of bare decking', required: true, options: [] }
+                ]
+            }
+        ]
+    }
+];
+
 export const CHECKLIST_DATA = {
     Small: {
         lead: [
