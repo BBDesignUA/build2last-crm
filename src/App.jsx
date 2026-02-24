@@ -1,0 +1,268 @@
+import { useState } from 'react';
+import { Sidebar, Header } from './components/Layout';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, X, Briefcase, Plus } from 'lucide-react';
+
+import { MOCK_STAGES, MOCK_JOBS, MOCK_CLIENTS } from './data/mockData';
+import { WorkflowView } from './components/WorkflowView';
+import { NotificationsView } from './components/NotificationsView';
+import { ClientsView } from './components/ClientsView';
+import { JobDashboardModal } from './components/JobDashboard';
+import { CreateJobModal } from './components/CreateJobModal';
+import { LoginView } from './components/LoginView';
+import { TeamView } from './components/TeamView';
+import { useAuth } from './contexts/AuthContext';
+
+function App() {
+    const { user } = useAuth();
+    const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+    const [activeTab, setActiveTab] = useState('pipeline');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [jobs, setJobs] = useState(MOCK_JOBS);
+    const [clients, setClients] = useState(MOCK_CLIENTS);
+    const [selectedJob, setSelectedJob] = useState(null);
+    const [focusedWorkflowJob, setFocusedWorkflowJob] = useState(MOCK_JOBS[0]);
+    const [isCreateJobOpen, setIsCreateJobOpen] = useState(false);
+    const [toast, setToast] = useState(null);
+
+    const filteredJobs = jobs.filter(job =>
+        job.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.trade.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const handleUpdateJob = (updatedJob) => {
+        setJobs(jobs.map(j => j.id === updatedJob.id ? updatedJob : j));
+        if (selectedJob?.id === updatedJob.id) setSelectedJob(updatedJob);
+        if (focusedWorkflowJob?.id === updatedJob.id) setFocusedWorkflowJob(updatedJob);
+    };
+
+    const handleAddJob = (newJob) => {
+        setJobs(prev => [newJob, ...prev]);
+        setToast(`New job created for ${newJob.clientName}`);
+    };
+
+    const handleDeleteJob = (jobId) => {
+        setJobs(jobs.filter(j => j.id !== jobId));
+        if (selectedJob?.id === jobId) setSelectedJob(null);
+        if (focusedWorkflowJob?.id === jobId) setFocusedWorkflowJob(null);
+        setToast('Job successfully deleted');
+    };
+
+    const handleAddClient = (newClient) => {
+        setClients(prev => [...prev, newClient]);
+        setToast(`Client ${newClient.name} added`);
+    };
+
+    const handleUpdateClient = (updatedClient) => {
+        setClients(clients.map(c => c.id === updatedClient.id ? updatedClient : c));
+        setToast(`Client ${updatedClient.name} updated`);
+    };
+
+    const handleDeleteClient = (clientId) => {
+        setClients(clients.filter(c => c.id !== clientId));
+        // Note: keeping orphans intentionally for demonstration, or could prompt to delete jobs
+        setToast('Client deleted');
+    };
+
+    const showToast = (message) => {
+        setToast(message);
+        setTimeout(() => setToast(null), 3000);
+    };
+
+    const handleSendEmail = (job) => {
+        // Find job and add activity entry
+        const updatedJob = {
+            ...job,
+            communications: [
+                { id: `m-${Date.now()}`, type: 'email', date: new Date().toISOString().split('T')[0], text: `Automated/Manual email sent to ${job.clientName}` },
+                ...(job.communications || [])
+            ]
+        };
+        handleUpdateJob(updatedJob);
+        showToast(`Email notification dispatched to ${job.clientName}`);
+    };
+
+    const handleJobSelect = (job) => {
+        setFocusedWorkflowJob(job);
+    };
+
+    if (!user) {
+        return <LoginView />;
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50 flex text-gray-900">
+            <Sidebar
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                isExpanded={isSidebarExpanded}
+                setIsExpanded={setIsSidebarExpanded}
+            />
+
+            <main className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isSidebarExpanded ? 'ml-64' : 'ml-20 md:ml-24'}`}>
+                <Header onSearch={setSearchQuery} />
+
+                <div className="flex-1 p-8">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={`${activeTab}`}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                            className="h-full flex flex-col"
+                        >
+                            {activeTab === 'pipeline' && (
+                                <>
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div>
+                                            <h1 className="text-4xl font-title font-bold tracking-tight uppercase text-gray-900 leading-none">Job Pipeline</h1>
+                                            <p className="text-xs font-bold text-gray-400 mt-2 uppercase tracking-[0.2em]">Building Quality that Lasts</p>
+                                        </div>
+
+                                        <div className="flex items-center gap-6">
+                                            {/* Action Button */}
+                                            <button
+                                                onClick={() => setIsCreateJobOpen(true)}
+                                                className="px-6 py-3 rounded-2xl bg-primary shadow-lg shadow-primary/20 font-title font-bold text-xs uppercase tracking-widest text-white hover:opacity-90 transition-all flex items-center gap-2 active:scale-[0.98]"
+                                            >
+                                                <Briefcase size={16} />
+                                                New Job
+                                            </button>
+
+                                            <div className="bg-white p-1 rounded-2xl border border-gray-200 flex gap-1 shadow-sm h-[48px]">
+                                                <div className="px-5 flex flex-col justify-center border-r border-gray-100">
+                                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Leads</p>
+                                                    <p className="text-lg font-title font-extrabold text-primary leading-none">{jobs.length}</p>
+                                                </div>
+                                                <div className="px-5 flex flex-col justify-center">
+                                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Revenue</p>
+                                                    <p className="text-lg font-title font-extrabold text-gray-900 leading-none">
+                                                        ${jobs.reduce((acc, job) => acc + job.pricing.total, 0).toLocaleString()}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex-1 flex gap-8 min-h-0">
+                                        {/* Mini Sidebar for Job Selection in Workflow View */}
+                                        <div className="w-80 flex flex-col gap-4 overflow-y-auto pr-2">
+                                            {filteredJobs.map(j => (
+                                                <button
+                                                    key={j.id}
+                                                    onClick={() => setFocusedWorkflowJob(j)}
+                                                    className={`p-6 rounded-[2rem] border text-left transition-all active:scale-[0.98] ${focusedWorkflowJob?.id === j.id
+                                                        ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
+                                                        : 'bg-white border-gray-100 hover:border-gray-200 shadow-sm'
+                                                        }`}
+                                                >
+                                                    <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${focusedWorkflowJob?.id === j.id ? 'text-white/70' : 'text-gray-400'
+                                                        }`}>
+                                                        {j.trade}
+                                                    </p>
+                                                    <p className="font-title font-bold text-lg leading-tight mb-2 uppercase tracking-tight">
+                                                        {j.clientName}
+                                                    </p>
+                                                    <div className="flex items-center justify-between">
+                                                        <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter ${focusedWorkflowJob?.id === j.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                                                            }`}>
+                                                            {j.status.replace('-', ' ')}
+                                                        </span>
+                                                        <span className="text-xs font-title font-bold">${j.pricing.total.toLocaleString()}</span>
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* Main Workflow View */}
+                                        <div className="flex-1 overflow-y-auto pr-2 pb-8">
+                                            <WorkflowView
+                                                job={focusedWorkflowJob}
+                                                stages={MOCK_STAGES}
+                                                onUpdateJob={handleUpdateJob}
+                                                onSendEmail={handleSendEmail}
+                                            />
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            {activeTab === 'notifications' && (
+                                <NotificationsView />
+                            )}
+
+                            {activeTab === 'clients' && (
+                                <ClientsView
+                                    clients={clients}
+                                    jobs={jobs}
+                                    onAddClient={handleAddClient}
+                                    onUpdateClient={handleUpdateClient}
+                                    onDeleteClient={handleDeleteClient}
+                                    onJobClick={(job) => {
+                                        setSelectedJob(job);
+                                        // Optional: switch to pipeline if needed
+                                    }}
+                                />
+                            )}
+
+                            {activeTab === 'team' && (
+                                <TeamView />
+                            )}
+
+                            {activeTab !== 'pipeline' && activeTab !== 'notifications' && activeTab !== 'clients' && activeTab !== 'team' && (
+                                <div className="flex flex-col items-center justify-center h-[80vh] text-center text-gray-400">
+                                    <h2 className="text-3xl font-title font-bold mb-2 tracking-widest uppercase">{activeTab} View</h2>
+                                    <p className="font-body opacity-60">This module is part of the future development roadmap.</p>
+                                </div>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
+
+                <AnimatePresence>
+                    {selectedJob && (
+                        <JobDashboardModal
+                            job={selectedJob}
+                            onClose={() => setSelectedJob(null)}
+                            onUpdateJob={handleUpdateJob}
+                            onDeleteJob={handleDeleteJob}
+                        />
+                    )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    {isCreateJobOpen && (
+                        <CreateJobModal
+                            onClose={() => setIsCreateJobOpen(false)}
+                            onAddJob={handleAddJob}
+                            clients={clients}
+                            onAddClient={handleAddClient}
+                        />
+                    )}
+                </AnimatePresence>
+
+                {/* Global Toast Notification */}
+                <AnimatePresence>
+                    {toast && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                            className="fixed bottom-8 right-8 bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 border border-white/10"
+                        >
+                            <CheckCircle2 size={20} className="text-green-400" />
+                            <span className="font-body text-sm font-medium tracking-wide">{toast}</span>
+                            <button onClick={() => setToast(null)} className="ml-4 text-gray-400 hover:text-white transition-colors">
+                                <X size={16} />
+                            </button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </main>
+        </div>
+    );
+}
+
+export default App;
