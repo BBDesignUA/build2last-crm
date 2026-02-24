@@ -11,7 +11,7 @@ import { JobDashboardModal } from './components/JobDashboard';
 
 function App() {
     const [activeTab, setActiveTab] = useState('pipeline');
-    const [viewMode, setViewMode] = useState('board'); // 'board' or 'workflow'
+    const [viewMode, setViewMode] = useState('workflow'); // 'board' or 'workflow'
     const [searchQuery, setSearchQuery] = useState('');
     const [jobs, setJobs] = useState(MOCK_JOBS);
     const [selectedJob, setSelectedJob] = useState(null);

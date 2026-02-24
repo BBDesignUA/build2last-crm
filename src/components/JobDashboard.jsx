@@ -84,8 +84,8 @@ export const JobDashboardModal = ({ job, onClose, onUpdateJob }) => {
                                         key={size}
                                         onClick={() => updateJobSize(size)}
                                         className={`px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${job.jobSize === size
-                                                ? 'bg-white text-primary shadow-sm'
-                                                : 'text-gray-400 hover:text-gray-600'
+                                            ? 'bg-white text-primary shadow-sm'
+                                            : 'text-gray-400 hover:text-gray-600'
                                             }`}
                                     >
                                         {size}
@@ -166,8 +166,8 @@ export const JobDashboardModal = ({ job, onClose, onUpdateJob }) => {
                                         key={item.id}
                                         onClick={() => toggleChecklistItem(item.id)}
                                         className={`w-full flex items-center gap-4 p-5 rounded-2xl border transition-all text-left shadow-sm active:scale-[0.99] ${item.completed
-                                                ? 'bg-green-50 border-green-100 text-green-700'
-                                                : 'bg-white border-gray-100 text-gray-700 hover:border-primary/20 hover:shadow-md'
+                                            ? 'bg-green-50 border-green-100 text-green-700'
+                                            : 'bg-white border-gray-100 text-gray-700 hover:border-primary/20 hover:shadow-md'
                                             }`}
                                     >
                                         {item.completed ? (
@@ -176,7 +176,7 @@ export const JobDashboardModal = ({ job, onClose, onUpdateJob }) => {
                                             <Circle size={26} className="text-gray-200 flex-shrink-0 group-hover:text-primary transition-colors" />
                                         )}
                                         <div className="flex-1">
-                                            <span className={`text-lg font-title tracking-tight font-bold ${item.completed ? 'opacity-60 line-through' : ''}`}>
+                                            <span className={`text-[15px] font-body tracking-normal ${item.completed ? 'opacity-60 line-through' : 'font-medium text-gray-900'}`}>
                                                 {item.task}
                                             </span>
                                         </div>
@@ -204,8 +204,8 @@ export const JobDashboardModal = ({ job, onClose, onUpdateJob }) => {
                                     key={tab.id}
                                     onClick={() => setActiveSubTab(tab.id)}
                                     className={`flex-1 flex flex-col items-center justify-center py-6 border-b-4 transition-all gap-1.5 ${activeSubTab === tab.id
-                                            ? 'border-primary text-primary bg-primary/5'
-                                            : 'border-transparent text-gray-400 hover:text-gray-600'
+                                        ? 'border-primary text-primary bg-primary/5'
+                                        : 'border-transparent text-gray-400 hover:text-gray-600'
                                         }`}
                                 >
                                     <tab.icon size={22} />

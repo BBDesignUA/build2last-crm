@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     CheckCircle2,
     Circle,
@@ -14,6 +14,13 @@ import {
 import { CHECKLIST_DATA } from '../data/mockData';
 
 export const WorkflowView = ({ job, stages, onUpdateJob }) => {
+    const [expandedTaskId, setExpandedTaskId] = useState(null);
+
+    const toggleExpand = (e, taskId) => {
+        e.stopPropagation();
+        setExpandedTaskId(prev => prev === taskId ? null : taskId);
+    };
+
     if (!job) {
         return (
             <div className="h-full flex flex-col items-center justify-center text-gray-400 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-12">
@@ -110,8 +117,8 @@ export const WorkflowView = ({ job, stages, onUpdateJob }) => {
                         return (
                             <div key={stage.id} className="relative z-10 flex flex-col items-center group">
                                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 shadow-sm ${isActive ? 'bg-primary border-primary text-white scale-110 shadow-lg shadow-primary/30' :
-                                        isCompleted ? 'bg-white border-primary text-primary' :
-                                            'bg-white border-gray-100 text-gray-300'
+                                    isCompleted ? 'bg-white border-primary text-primary' :
+                                        'bg-white border-gray-100 text-gray-300'
                                     }`}>
                                     {isCompleted ? <CheckCircle2 size={24} /> :
                                         isActive ? <Clock size={24} className="animate-spin-slow" /> :
@@ -173,29 +180,60 @@ export const WorkflowView = ({ job, stages, onUpdateJob }) => {
                                             const jobTaskMatch = job.checklist?.find(t => t.id === task.id);
                                             const isDone = isPastStage || (jobTaskMatch?.completed);
 
+                                            const isExpanded = expandedTaskId === task.id;
+
                                             return (
                                                 <div
                                                     key={task.id}
-                                                    className={`p-4 rounded-2xl border flex items-center gap-4 transition-all ${isDone
-                                                            ? 'bg-green-50/50 border-green-100 opacity-60'
-                                                            : 'bg-white border-gray-100 shadow-sm hover:shadow-md'
+                                                    className={`rounded-2xl border overflow-hidden transition-all ${isDone
+                                                        ? 'bg-green-50/50 border-green-100 opacity-60'
+                                                        : 'bg-white border-gray-100 shadow-sm hover:shadow-md'
                                                         }`}
                                                 >
-                                                    {isDone ? (
-                                                        <CheckCircle2 size={20} className="text-green-500" />
-                                                    ) : (
-                                                        <Circle size={20} className="text-gray-200" />
-                                                    )}
-                                                    <div className="flex-1">
-                                                        <p className={`text-sm font-title font-bold tracking-tight uppercase ${isDone ? 'text-green-900' : 'text-gray-700'}`}>
-                                                            {task.task}
-                                                        </p>
+                                                    <div
+                                                        className="p-4 flex items-center gap-4 cursor-pointer"
+                                                        onClick={() => !isDone && toggleTask(task.id, section.stageId)}
+                                                    >
+                                                        {isDone ? (
+                                                            <CheckCircle2 size={20} className="text-green-500 flex-shrink-0" />
+                                                        ) : (
+                                                            <Circle size={20} className="text-gray-200 flex-shrink-0" />
+                                                        )}
+                                                        <div className="flex-1">
+                                                            <p className={`text-sm font-body tracking-normal ${isDone ? 'text-green-900 line-through opacity-80' : 'text-gray-900 font-medium'}`}>
+                                                                {task.task}
+                                                            </p>
+                                                        </div>
+                                                        {task.assignee && (
+                                                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border uppercase tracking-widest leading-none ${assigneeColors[task.assignee] || assigneeColors.General}`}>
+                                                                {task.assignee}
+                                                            </span>
+                                                        )}
+                                                        <button
+                                                            onClick={(e) => toggleExpand(e, task.id)}
+                                                            className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 transition-colors"
+                                                        >
+                                                            <ChevronRight size={16} className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
+                                                        </button>
                                                     </div>
-                                                    {task.assignee && (
-                                                        <span className={`px-2 py-0.5 rounded-full text-[8px] font-bold border uppercase tracking-widest leading-none ${assigneeColors[task.assignee] || assigneeColors.General}`}>
-                                                            {task.assignee}
-                                                        </span>
-                                                    )}
+                                                    <AnimatePresence>
+                                                        {isExpanded && (
+                                                            <motion.div
+                                                                initial={{ height: 0, opacity: 0 }}
+                                                                animate={{ height: 'auto', opacity: 1 }}
+                                                                exit={{ height: 0, opacity: 0 }}
+                                                                className="px-4 pb-4 border-t border-gray-50 bg-gray-50/30"
+                                                            >
+                                                                <div className="pt-3 text-sm font-body text-gray-600 space-y-2 leading-relaxed">
+                                                                    <p><strong>Description:</strong> Please review and complete all necessary sub-tasks associated with this action item. Consult the project manual if specific guidelines are unclear.</p>
+                                                                    <p className="flex items-center gap-2">
+                                                                        <Info size={14} className="text-primary" />
+                                                                        <span>Requires sign-off from {task.assignee || 'supervisor'} upon completion.</span>
+                                                                    </p>
+                                                                </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
                                                 </div>
                                             );
                                         })
