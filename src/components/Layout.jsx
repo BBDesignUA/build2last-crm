@@ -1,4 +1,4 @@
-import { LayoutGrid, Users, ClipboardCheck, Settings, Search, Bell, LogOut, Shield, ChevronRight, ChevronLeft } from 'lucide-react';
+import { LayoutGrid, Users, ClipboardCheck, Settings, Search, Bell, LogOut, Shield, ChevronRight, ChevronLeft, DollarSign } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const Sidebar = ({ activeTab, setActiveTab, isExpanded, setIsExpanded }) => {
@@ -7,11 +7,8 @@ export const Sidebar = ({ activeTab, setActiveTab, isExpanded, setIsExpanded }) 
     const menuItems = [
         { id: 'pipeline', icon: LayoutGrid, label: 'Pipeline' },
         { id: 'clients', icon: Users, label: 'Clients' },
-<<<<<<< HEAD
         { id: 'checklists', icon: ClipboardCheck, label: 'Checklists' },
-=======
-        { id: 'checklist', icon: ClipboardCheck, label: 'JFC' },
->>>>>>> 3a8d989b334644d5b788eec4cc011f5a4bd66d06
+        { id: 'pricing', icon: DollarSign, label: 'Pricing' },
         { id: 'notifications', icon: Bell, label: 'Notifications' },
         // Only show team management to admins
         ...(user?.role === 'admin' ? [{ id: 'team', icon: Shield, label: 'Team access' }] : []),
